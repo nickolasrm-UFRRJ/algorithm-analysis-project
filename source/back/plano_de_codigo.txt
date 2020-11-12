@@ -1,0 +1,81 @@
+JogoBack:
+main():
+{
+    Inicia o jogo (initJogo)
+    initJogo
+    {
+        copia os zumbis (map_data[c.ZOMBIE_LIST]) pra zombies_list inicia o timer, inicia sun_value.
+        self.rodando = True
+    }
+    gameLoop()
+    {
+        while rodando == true
+        nextFrame()
+        {
+            - atualiza todos os elementos do jogo
+            - checa coisas como colisao, atk, etc.
+        }
+        - pausa quando apertar j
+        - j apertado a jogada comeca.
+        - if key == j:
+        {
+            play()
+            {
+                - ate agora vai ser um teste pra ver se o jogo roda.
+                - testar insercao de todo o tipo de planta.
+            }        
+        }
+    }
+
+} 
+
+plant_back
+{
+    class Plant {
+        - é classe abstrata com atributos: vida, nome, x, y.
+        - tem como funcoes:
+        {
+            se for sunflower tem q retornar quando tem q adicionar sol.
+            se for peashooter tem q retornar quando tem q atirar.
+            se for ... e vai ser isso.
+            update() {
+                nao precisa de alteracao
+                so retorne handleState()
+            }
+            handleState() {
+                chama a funcao de acordo com o estado, e repassa o retorno da fc de estado.
+            }
+            os 3 estados de planta, no qual tem alguma acao sao: idling, attacking e digest.
+            idling()
+            {
+                quando a planta e sunflower, retorna 1 se for hora de adicionar sol.
+            }
+        }
+
+    }
+}
+
+TIPOS DE PLANTAS NECESSARIOS:
+{
+    SUNFLOWER:
+    {
+        PRODUZ SOL EM UM INTERVALO DE TEMPO, NAO DA DANO.
+    }
+
+    PEASHOOTER:
+    {
+        ATIRA UMA BALA QUE DA UMA CERTA QUANTIDADE DE DANO, E TEM UMA CERTA VELOCIDADE.
+    }
+    NOZ
+    {
+        TEM VIDA ALTA, BLOQUEIA OS ZUMBIS POR UM BOM TEMPO.
+    }
+    BATATA_MINA
+    {
+        EXPLODE OS ZUMBIS QUE TIVEREM NO RANGE DELA, NA MESMA LINHA, TEM UM COOLDOWN DE INICIO.
+    }
+    CEREJA
+    {
+        O MESMO QUE A BATATA MINA, MAS SEM COOLDOWN, E EXPLODE INIMIGOS EM LINHAS ADJACENTES TAMBEM.
+    }
+}
