@@ -1,9 +1,8 @@
 import os
 import json
+from source.back.auxiliar import SUN_TIMER
 from source.constants import GRID_Y_LEN
-import pygame as pg
 from .. import constants as c
-from . import frame
 from .componentes.map import Map
 from .componentes import plant_back as plant
 from . import auxiliar as aux
@@ -14,12 +13,8 @@ class JogoBack():
         # mapa = instancia do mapa, em /source/component/map.py
         # mapa comeca zerado a cada insercao ele vai olhar no mapa pra ver se da pra fazer ou nao
         self.m = Map(c.GRID_X_LEN, c.GRID_Y_LEN)
-        self.surface = pg.display.get_surface()
-        self.surface.fill((255,255,255))
         self.state = None
-        self.clock = pg.time.Clock()
         self.current_time = 0
-        self.stateTimer = 0
         self.state = aux.SHOW_MAP
 
     def setupPlants(self):
@@ -41,7 +36,7 @@ class JogoBack():
         self.setupPlants()
         self.setupZombies()
         self.sun_value = self.m.map_data[c.INIT_SUN_NAME]
-        self.sun_timer = self.current_time
+        self.sun_timer = 0
         pass
 
     def addPlant(self, name, x, y):
@@ -68,25 +63,11 @@ class JogoBack():
             pass
         else:
             pass
-        
-    def handleEvents(self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                print(aux.QUIT)
-                self.rodando = False
-            elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    print(aux.QUIT)
-                    self.rodando = False
-                elif event.key == pg.K_j:
-                    if self.state != aux.JOGADA:
-                        self.state = aux.JOGADA
-                    print(aux.JOGADA)
-            pass    
     
     def showState(self):
         print(aux.FLIP_STATE)
         print("Total de sois = " + str(self.sun_value))
+        print("Sun timer: " + str(self.sun_timer))
         print(aux.BREAK_LINE)
         for i in range(self.m.alt):
             print(self.m.map[i])
@@ -108,6 +89,9 @@ class JogoBack():
         print("Zombies list")
         for zombie in self.zombie_list:
             print(zombie)
+        
+        print("Digite qualquer elemento e aperte enter para continuar:")
+        input()
 
     def updatePlant(self):
         for i in range(c.GRID_Y_LEN):
@@ -121,40 +105,41 @@ class JogoBack():
 
     def updateEstados(self):
         # Update nas variaveis
-        self.updatePlant()
+        # self.updatePlant()
 
-        if (self.current_time - self.sun_timer) >= c.PRODUCE_SUN_INTERVAL:
-            self.sun_timer = self.current_time
-            self.sun_value += c.SUN_VALUE
+        if self.sun_timer >= aux.SUN_TIMER:
+            self.sun_value += 25 * int(self.sun_timer / aux.SUN_TIMER)
+            self.sun_timer = int(self.sun_timer % aux.SUN_TIMER)
 
-    def updateFrame(self):
-        self.current_time = pg.time.get_ticks()
-        # Da update em todos os frames
-        self.handleEvents()
-        self.updateEstados()
-        # self.play()
-        pass
+    def updateFrame(self, n_frames):
+        for i in range (n_frames):
+            self.sun_timer += 1
+            # Da update em todos os frames
+            self.updateEstados()
+            # self.play()
 
     def gameLoop(self):
-
-        if (self.current_time - self.stateTimer) >= 1000 and self.state == aux.SHOW_MAP:
-            self.stateTimer = self.current_time
-            self.showState()
-        elif self.state == aux.JOGADA:
-            self.play()
-            self.state = aux.SHOW_MAP
+        opcao = 0
+        print(aux.FLIP_STATE)
+        print(aux.DECISAO)
+        opcao = int(input())
+        if opcao == 1:
+            self.updateFrame(1)
+        elif opcao == 2:
+            print(aux.DECISAO_2)
+            self.updateFrame(int(input()))
+        elif opcao == 3:
+            self.updateFrame( (aux.SUN_TIMER - int(self.sun_timer % aux.SUN_TIMER) ) )
             pass
-        self.updateFrame()
-        pass
+        elif opcao == 4:
+            self.rodando = False
+        else:
+            pass
+        self.showState()
 
     def main(self):
         self.rodando = True
-        self.pause = False
         self.initJogo()
-        self.addPlant(c.SUNFLOWER, 0, 0)
-        self.sun_value -= 50
         while self.rodando:
             self.gameLoop()
-            pg.display.update()
-            self.clock.tick(60)
         pass

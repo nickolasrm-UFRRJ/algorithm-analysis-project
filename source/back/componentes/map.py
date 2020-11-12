@@ -1,6 +1,5 @@
 import os
 import json
-import pygame as pg
 from ... import constants as c
 
 class Map():
