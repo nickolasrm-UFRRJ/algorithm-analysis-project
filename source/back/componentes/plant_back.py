@@ -7,15 +7,20 @@ class Cars():
         return
 
 class Bullet():
-    def __init__ (self):
-        return
+    def __init__ (self, y, damage, start_x):
+        self.name = "bullet"
+        self.y_pos = y
+        self.damage = damage
+        self.speed = 4
+        self.x_pos = start_x
+    
+    def update(self):
+        self.x_pos += self.speed
 
 class Plant():
     def __init__ (self, x, y, name, health, bullet_group=None):
         self.name = name
         self.health = health
-        self.bullet_group = bullet_group
-        self.hit_timer= 0
         self.current_time = 0
         self.state = 0
 
@@ -51,11 +56,13 @@ class SunFlower(Plant):
 class PeaShooter(Plant):
     def __init__ (self, x, y):
         Plant.__init__(self, x, y, c.PEASHOOTER, c.PLANT_HEALTH)
+        self.hit_timer = -1
 
     def attack(self):
-        if self.hit_timer % a.PEASHOOTER_TIMER:
+        if self.hit_timer % a.PEASHOOTER_TIMER == 0:
             self.hit_timer = 0
-           # return Bullet
+            centerx = ( ((self.x+1) * c.GRID_X_SIZE) - (c.GRID_X_SIZE/2) )
+            return Bullet(self.y, c.BULLET_DAMAGE_NORMAL, centerx)
         return None
 
     def update(self):

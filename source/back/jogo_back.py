@@ -32,9 +32,13 @@ class JogoBack():
         self.zombie_start_time = 0
         self.zombie_list.sort(key=takeTime)
 
+    def setupBullets(self):
+        self.bullet_list = [[] for y in range(5)]
+
     def initJogo(self):
         #inicia o jogo, carrega zumbis, os tipos de planta disponiveis, sois iniciais, etc. Chamado pela main
         self.setupPlants()
+        self.setupBullets()
         self.setupZombies()
         self.sun_value = self.m.map_data[c.INIT_SUN_NAME]
         self.sun_timer = 0
@@ -43,6 +47,9 @@ class JogoBack():
     def addPlant(self, name, x, y):
         if name == c.SUNFLOWER:
             self.plants_list[y].append(plant.SunFlower(x, y))
+            self.m.map[y][x] = 1
+        elif name == c.PEASHOOTER:
+            self.plants_list[y].append(plant.PeaShooter(x, y))
             self.m.map[y][x] = 1
 
     def play(self):
@@ -53,6 +60,7 @@ class JogoBack():
         opcao = 0
         print("Escolha uma planta")
         opcao = int(input())
+
         if opcao == 1:
             print(aux.BREAK_LINE)
             print("Digite a posição que deseja inserir ( y e depois x ): ")
@@ -78,7 +86,33 @@ class JogoBack():
                 print(aux.BREAK_LINE + "Não possui sol o bastante!")
                 print(aux.BREAK_LINE + "Aperte enter para continuar")
                 input()
+
+
         elif opcao == 2:
+            print(aux.BREAK_LINE)
+            print("Digite a posição que deseja inserir ( y e depois x ): ")
+            label = "y = "
+            y = int(input(label))
+            label = "x = "
+            x = int(input(label))
+            if self.sun_value >= aux.plant_sun_list[opcao-1] and self.freezing[opcao-1] <= 0:
+                if self.m.isEmpty(x, y):
+                    self.sun_value -= aux.plant_sun_list[opcao-1]
+                    self.freezing[opcao-1] = aux.plant_frozen_time_list[opcao-1]
+                    self.addPlant(c.PEASHOOTER, x, y)
+                    pass
+                else:
+                    print(aux.BREAK_LINE + "Posição não disponível!")
+                    print(aux.BREAK_LINE + "Aperte enter para continuar")
+                    input()
+            elif self.freezing[opcao-1] > 0:
+                print(aux.BREAK_LINE + "A planta está em cooldown")
+                print(aux.BREAK_LINE + "Aperte enter para continuar")
+                input()
+            else:
+                print(aux.BREAK_LINE + "Não possui sol o bastante!")
+                print(aux.BREAK_LINE + "Aperte enter para continuar")
+                input()
             pass
         elif opcao == 3:
             pass
@@ -104,7 +138,7 @@ class JogoBack():
             for plant in self.plants_list[i]:
                 string += str(plant.name) + " " + str(plant.y) + " " + str(plant.x) + "/ "
                 if plant.name == c.SUNFLOWER:
-                    string += "sun timer = " + str(plant.sun_timer)
+                    string += "sun timer = " + str(plant.sun_timer) + " / "
             print(string)
         
         print(aux.BREAK_LINE)
@@ -116,9 +150,32 @@ class JogoBack():
         print("Zombies list")
         for zombie in self.zombie_list:
             print(zombie)
+
+        print(aux.BREAK_LINE)
+        print("Bullet list")
+        for i in range(5):
+            # print(self.bullet_list[i])
+            string = ""
+            for bullet in self.bullet_list[i]:
+                string += str(bullet.name) + " - x = " + str(bullet.x_pos) + ", y = " + str(bullet.y_pos) + " // "
+            print(string)
+        
+        print(aux.BREAK_LINE)
+        print(aux.BREAK_LINE)
         
         print("Digite qualquer elemento e aperte enter para continuar:")
         input()
+
+    # SESSAO DAS COLISOES
+
+    def checkBulletColision(self):
+        for i in range(5):
+            for bullet in self.bullet_list[i]:
+                if bullet.x_pos > (c.GRID_X_LEN + 1) * c.GRID_X_SIZE:
+                    self.bullet_list[i].remove(bullet)
+                    
+
+    # SESSAO DOS UPDATES
 
     def updateFreeze(self):
         # self.freezing eh um vetor de 5 posicoes em que cada posicao corresponde a um tipo de carta.
@@ -126,19 +183,31 @@ class JogoBack():
             if self.freezing[i] > 0:
                 self.freezing[i] -= 1
 
+    def updateBullet(self):
+        for i in range(5):
+            for bullet in self.bullet_list[i]:
+                bullet.update()
+        pass
+
     def updatePlant(self):
         for i in range(c.GRID_Y_LEN):
             for plant in self.plants_list[i]:
                 if plant.name == c.SUNFLOWER:
                     # print("Sunflower_timer " + str(plant.sun_timer))
                     self.sun_value += plant.update()
+                elif plant.name == c.PEASHOOTER:
+                    bullet = plant.update()
+                    if bullet != None:
+                        print("Adicionando bala!!!!!!!")
+                        self.bullet_list[i].append(bullet)
                 else:
                     continue
-
     def updateEstados(self):
         # Update nas variaveis
         self.updatePlant()
+        self.updateBullet()
 
+        self.checkBulletColision()
         if self.sun_timer >= aux.SUN_TIMER:
             self.sun_value += 25 * int(self.sun_timer / aux.SUN_TIMER)
             self.sun_timer = int(self.sun_timer % aux.SUN_TIMER)
