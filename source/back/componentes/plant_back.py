@@ -1,5 +1,6 @@
 import random
 from ... import constants as c
+from .. import auxiliar as a
 
 class Cars():
     def __init__ (self):
@@ -13,49 +14,53 @@ class Plant():
     def __init__ (self, x, y, name, health, bullet_group=None):
         self.name = name
         self.health = health
-        self.state = c.IDLE
         self.bullet_group = bullet_group
-        self.can_sleep = False
         self.hit_timer= 0
         self.current_time = 0
+        self.state = 0
 
         # x, y sao os indices do mapa
         self.x = x
         self.y = y
 
-    def update(self, current_time):
-        self.current_time = current_time
-        return self.action()
-
-    def action(self):
+    def update(self):
         pass
 
-    def setAttack(self):
-        self.state = c.ATTACK
-
-    def setIdle(self):
-        self.state = c.IDLE
-
-    def setSleep(self):
-        self.state = c.SLEEP
 
 class SunFlower(Plant):
     def __init__ (self, x, y):
         Plant.__init__(self, x, y, c.SUNFLOWER, c.PLANT_HEALTH)
-        self.sun_timer = 0
+        self.sun_timer = -a.SUNFLOWER_1CHARGE
     
-    def action(self):
-        if self.sun_timer == 0:
-            self.sun_timer = self.current_time - (c.FLOWER_SUN_INTERVAL - 6000)
-        elif (self.current_time - self.sun_timer) > c.FLOWER_SUN_INTERVAL:
-            self.sun_timer = self.current_time
-            return 1
+    def producedSun(self):
+        if self.sun_timer % a.SUNFLOWER_TIMER == 0:
+            if self.sun_timer == 0:
+                return 25
+            else:
+                result = 25 * int(self.sun_timer / a.SUNFLOWER_TIMER)
+                print("Aumentou " + str(result))
+                self.sun_timer = 0
+                return result
         return 0
+
+    def update(self):
+        self.sun_timer += 1
+        return self.producedSun()
 
 
 class PeaShooter(Plant):
-    def __init__ (self):
-        return
+    def __init__ (self, x, y):
+        Plant.__init__(self, x, y, c.PEASHOOTER, c.PLANT_HEALTH)
+
+    def attack(self):
+        if self.hit_timer % a.PEASHOOTER_TIMER:
+            self.hit_timer = 0
+           # return Bullet
+        return None
+
+    def update(self):
+        self.hit_timer += 1
+        return self.attack()
 
 class WallNut(Plant):
     def __init__ (self):

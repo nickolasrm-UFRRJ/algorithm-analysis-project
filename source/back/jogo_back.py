@@ -16,6 +16,7 @@ class JogoBack():
         self.state = None
         self.current_time = 0
         self.state = aux.SHOW_MAP
+        self.freezing = [ 0 for i in range(5)]
 
     def setupPlants(self):
         self.plants_list = [[] for y in range(5)]
@@ -47,19 +48,43 @@ class JogoBack():
     def play(self):
         # Aqui a Ia vai fazer a play, mas por enquanto usarei um sistema de pausa pra testar insercao
         # Pausa o cronometro. e insere. depois retorna
+        print(aux.BREAK_LINE)
         print(aux.PLAY)
         opcao = 0
         print("Escolha uma planta")
         opcao = int(input())
-        if input == 1:
+        if opcao == 1:
+            print(aux.BREAK_LINE)
+            print("Digite a posição que deseja inserir ( y e depois x ): ")
+            label = "y = "
+            y = int(input(label))
+            label = "x = "
+            x = int(input(label))
+            if self.sun_value >= aux.plant_sun_list[opcao-1] and self.freezing[opcao-1] <= 0:
+                if self.m.isEmpty(x, y):
+                    self.sun_value -= aux.plant_sun_list[opcao-1]
+                    self.freezing[opcao-1] = aux.plant_frozen_time_list[opcao-1]
+                    self.addPlant(c.SUNFLOWER, x, y)
+                    pass
+                else:
+                    print(aux.BREAK_LINE + "Posição não disponível!")
+                    print(aux.BREAK_LINE + "Aperte enter para continuar")
+                    input()
+            elif self.freezing[opcao-1] > 0:
+                print(aux.BREAK_LINE + "A planta está em cooldown")
+                print(aux.BREAK_LINE + "Aperte enter para continuar")
+                input()
+            else:
+                print(aux.BREAK_LINE + "Não possui sol o bastante!")
+                print(aux.BREAK_LINE + "Aperte enter para continuar")
+                input()
+        elif opcao == 2:
             pass
-        elif input == 2:
+        elif opcao == 3:
             pass
-        elif input == 3:
+        elif opcao == 4:
             pass
-        elif input == 4:
-            pass
-        elif input == 5:
+        elif opcao == 5:
             pass
         else:
             pass
@@ -78,6 +103,8 @@ class JogoBack():
             string = ""
             for plant in self.plants_list[i]:
                 string += str(plant.name) + " " + str(plant.y) + " " + str(plant.x) + "/ "
+                if plant.name == c.SUNFLOWER:
+                    string += "sun timer = " + str(plant.sun_timer)
             print(string)
         
         print(aux.BREAK_LINE)
@@ -93,19 +120,24 @@ class JogoBack():
         print("Digite qualquer elemento e aperte enter para continuar:")
         input()
 
+    def updateFreeze(self):
+        # self.freezing eh um vetor de 5 posicoes em que cada posicao corresponde a um tipo de carta.
+        for i in range(5):
+            if self.freezing[i] > 0:
+                self.freezing[i] -= 1
+
     def updatePlant(self):
         for i in range(c.GRID_Y_LEN):
             for plant in self.plants_list[i]:
                 if plant.name == c.SUNFLOWER:
-                    if plant.update(self.current_time) == 1:
-                        self.sun_value += 25
-                        print("opaaa")
+                    # print("Sunflower_timer " + str(plant.sun_timer))
+                    self.sun_value += plant.update()
                 else:
                     continue
 
     def updateEstados(self):
         # Update nas variaveis
-        # self.updatePlant()
+        self.updatePlant()
 
         if self.sun_timer >= aux.SUN_TIMER:
             self.sun_value += 25 * int(self.sun_timer / aux.SUN_TIMER)
@@ -115,6 +147,7 @@ class JogoBack():
         for i in range (n_frames):
             self.sun_timer += 1
             # Da update em todos os frames
+            self.updateFreeze()
             self.updateEstados()
             # self.play()
 
@@ -132,6 +165,8 @@ class JogoBack():
             self.updateFrame( (aux.SUN_TIMER - int(self.sun_timer % aux.SUN_TIMER) ) )
             pass
         elif opcao == 4:
+            self.play()
+        elif opcao == 5:
             self.rodando = False
         else:
             pass

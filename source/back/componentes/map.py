@@ -21,3 +21,8 @@ class Map():
     # Isso sera usando para retornar a posicao da planta no mapa para ver colisao
     def realXPos(self, x_index):
         return c.GRID_X_SIZE * (x_index+1)
+
+    def isEmpty(self, x, y):
+        if self.map[y][x] == 0:
+            return True
+        return False
