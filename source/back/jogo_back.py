@@ -51,6 +51,9 @@ class JogoBack():
         elif name == c.PEASHOOTER:
             self.plants_list[y].append(plant.PeaShooter(x, y))
             self.m.map[y][x] = 1
+        elif name == c.WALLNUT:
+            self.plants_list[y].append(plant.WallNut(x, y))
+            self.m.map[y][x] = 1
 
     def play(self):
         # Aqui a Ia vai fazer a play, mas por enquanto usarei um sistema de pausa pra testar insercao
@@ -114,7 +117,33 @@ class JogoBack():
                 print(aux.BREAK_LINE + "Aperte enter para continuar")
                 input()
             pass
+
+
         elif opcao == 3:
+            print(aux.BREAK_LINE)
+            print("Digite a posição que deseja inserir ( y e depois x ): ")
+            label = "y = "
+            y = int(input(label))
+            label = "x = "
+            x = int(input(label))
+            if self.sun_value >= aux.plant_sun_list[opcao-1] and self.freezing[opcao-1] <= 0:
+                if self.m.isEmpty(x, y):
+                    self.sun_value -= aux.plant_sun_list[opcao-1]
+                    self.freezing[opcao-1] = aux.plant_frozen_time_list[opcao-1]
+                    self.addPlant(c.WALLNUT, x, y)
+                    pass
+                else:
+                    print(aux.BREAK_LINE + "Posição não disponível!")
+                    print(aux.BREAK_LINE + "Aperte enter para continuar")
+                    input()
+            elif self.freezing[opcao-1] > 0:
+                print(aux.BREAK_LINE + "A planta está em cooldown")
+                print(aux.BREAK_LINE + "Aperte enter para continuar")
+                input()
+            else:
+                print(aux.BREAK_LINE + "Não possui sol o bastante!")
+                print(aux.BREAK_LINE + "Aperte enter para continuar")
+                input()
             pass
         elif opcao == 4:
             pass

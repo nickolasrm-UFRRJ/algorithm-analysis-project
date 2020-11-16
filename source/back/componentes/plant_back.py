@@ -70,7 +70,8 @@ class PeaShooter(Plant):
         return self.attack()
 
 class WallNut(Plant):
-    def __init__ (self):
+    def __init__ (self, x, y):
+        Plant.__init__(self, x, y, c.WALLNUT, c.WALLNUT_HEALTH)
         return
 
 class CherryBomb(Plant):

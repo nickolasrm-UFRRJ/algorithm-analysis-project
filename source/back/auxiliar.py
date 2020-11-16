@@ -54,3 +54,6 @@ plant_name_list = [SUNFLOWER, PEASHOOTER, WALLNUT,
 plant_sun_list = [50, 100, 50, 150, 25]
 plant_frozen_time_list = [450, 450, 1800, 3000, 1800]
 all_card_list = [0, 1, 2, 3, 4]
+
+def timeToFrame(m_seconds):
+    return (int(m_seconds/1000)*60)
