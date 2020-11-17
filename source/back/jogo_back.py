@@ -5,6 +5,7 @@ from source.constants import GRID_Y_LEN
 from .. import constants as c
 from .componentes.map import Map
 from .componentes import plant_back as plant
+from .componentes import zombie_back as zombie
 from . import auxiliar as aux
 
 
@@ -28,7 +29,7 @@ class JogoBack():
         self.zombie_list = []
         self.zombies_alive = [[] for y in range(5)]
         for data in self.m.map_data[c.ZOMBIE_LIST]:
-            self.zombie_list.append((data['time'], data['name'], data['map_y']))
+            self.zombie_list.append((aux.timeToFrame(data['time']), data['name'], data['map_y']))
         self.zombie_start_time = 0
         self.zombie_list.sort(key=takeTime)
 
@@ -42,6 +43,7 @@ class JogoBack():
         self.setupZombies()
         self.sun_value = self.m.map_data[c.INIT_SUN_NAME]
         self.sun_timer = 0
+        self.zombie_timer = 0
         pass
 
     def addPlant(self, name, x, y):
@@ -54,6 +56,15 @@ class JogoBack():
         elif name == c.WALLNUT:
             self.plants_list[y].append(plant.WallNut(x, y))
             self.m.map[y][x] = 1
+
+    def addZombie(self, name, y):
+        self.zombies_alive[y].append(zombie.Zombie(name, y, c.NORMAL_HEALTH))
+
+    def sortPlants(self):
+        def takePosX(plant):
+            return plant.x
+        for i in range(c.GRID_Y_LEN):
+            self.plants_list[i].sort(key=takePosX)
 
     def play(self):
         # Aqui a Ia vai fazer a play, mas por enquanto usarei um sistema de pausa pra testar insercao
@@ -76,6 +87,7 @@ class JogoBack():
                     self.sun_value -= aux.plant_sun_list[opcao-1]
                     self.freezing[opcao-1] = aux.plant_frozen_time_list[opcao-1]
                     self.addPlant(c.SUNFLOWER, x, y)
+                    self.sortPlants()
                     pass
                 else:
                     print(aux.BREAK_LINE + "Posição não disponível!")
@@ -103,6 +115,7 @@ class JogoBack():
                     self.sun_value -= aux.plant_sun_list[opcao-1]
                     self.freezing[opcao-1] = aux.plant_frozen_time_list[opcao-1]
                     self.addPlant(c.PEASHOOTER, x, y)
+                    self.sortPlants()
                     pass
                 else:
                     print(aux.BREAK_LINE + "Posição não disponível!")
@@ -131,7 +144,7 @@ class JogoBack():
                     self.sun_value -= aux.plant_sun_list[opcao-1]
                     self.freezing[opcao-1] = aux.plant_frozen_time_list[opcao-1]
                     self.addPlant(c.WALLNUT, x, y)
-                    pass
+                    self.sortPlants()
                 else:
                     print(aux.BREAK_LINE + "Posição não disponível!")
                     print(aux.BREAK_LINE + "Aperte enter para continuar")
@@ -165,15 +178,14 @@ class JogoBack():
         for i in range(self.m.alt):
             string = ""
             for plant in self.plants_list[i]:
-                string += str(plant.name) + " " + str(plant.y) + " " + str(plant.x) + "/ "
-                if plant.name == c.SUNFLOWER:
-                    string += "sun timer = " + str(plant.sun_timer) + " / "
+                string += str(plant.name) + " " + str(plant.y) + " " + str(plant.x) + " :: "
             print(string)
         
         print(aux.BREAK_LINE)
         print("Zombies alive")
         for i in range(self.m.alt):
-            print(self.zombies_alive[i])
+            for zombie in self.zombies_alive[i]:
+                print("Nome: " + str(zombie.name) + " :: MAP_Y: " + str(zombie.y)  + " :: MAP_X: " + str(zombie.x))
 
         print(aux.BREAK_LINE)
         print("Zombies list")
@@ -197,12 +209,35 @@ class JogoBack():
 
     # SESSAO DAS COLISOES
 
+    def checkPlantColision(self, zombie):
+        for i in range(c.GRID_Y_LEN):
+            for j in range(len(self.plants_list[i])):
+                plant = self.plants_list[i][j]
+        return None
+
     def checkBulletColision(self):
         for i in range(5):
             for bullet in self.bullet_list[i]:
                 if bullet.x_pos > (c.GRID_X_LEN + 1) * c.GRID_X_SIZE:
                     self.bullet_list[i].remove(bullet)
-                    
+
+    def checkZombieColision(self):
+        for i in range(5):
+            for zombie in self.zombies_alive[i]:
+                plant = self.checkPlantColision(zombie)
+                if plant != None:
+                    pass
+
+
+    # ADICIONANDO ZUMBIS NO DEVIDO TEMPO
+    def checkStartTime(self):
+        if len(self.zombie_list) > 0:
+            self.zombie_timer += 1
+            for zombie in self.zombie_list:
+                if self.zombie_timer >= zombie[0]:
+                    print("adding")
+                    self.addZombie(zombie[1], zombie[2])
+                    self.zombie_list.pop(0)     
 
     # SESSAO DOS UPDATES
 
@@ -231,6 +266,14 @@ class JogoBack():
                         self.bullet_list[i].append(bullet)
                 else:
                     continue
+
+    def updateZombie(self):
+        for i in range(c.GRID_Y_LEN):
+            for zombie in self.zombies_alive[i]:
+                # Se colide, ataca se nao, anda
+                pass
+        pass
+
     def updateEstados(self):
         # Update nas variaveis
         self.updatePlant()
@@ -244,10 +287,11 @@ class JogoBack():
     def updateFrame(self, n_frames):
         for i in range (n_frames):
             self.sun_timer += 1
+            
             # Da update em todos os frames
+            self.checkStartTime()
             self.updateFreeze()
             self.updateEstados()
-            # self.play()
 
     def gameLoop(self):
         opcao = 0
