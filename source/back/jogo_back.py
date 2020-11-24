@@ -328,7 +328,7 @@ class JogoBack():
                 if abs( i - plant.y) > plant.explode_y_range:
                     continue
                 else:
-                    print("TRY BOOM: " + str(i))
+                    # print("TRY BOOM: " + str(i))
                     for zombie in self.zombies_alive[i]:
                         real_x = self.m.realXPos(plant.x)
                         if abs( ( zombie.x + 14) - ( real_x - 40 ) ) <= plant.explode_x_range:
