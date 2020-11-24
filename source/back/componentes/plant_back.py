@@ -75,10 +75,23 @@ class WallNut(Plant):
         return
 
 class CherryBomb(Plant):
-    def __init__ (self):
+    def __init__ (self,x , y):
+        Plant.__init__(self, x, y, c.CHERRYBOMB, c.PLANT_HEALTH)
+        self.explode_x_range = int(c.GRID_X_SIZE)
+        self.explode_y_range = 1
         return
 
 class PotatoMine(Plant):
-    def __init__ (self):
-        return
+    def __init__ (self, x, y):
+        Plant.__init__(self, x, y, c.POTATOMINE, c.PLANT_HEALTH)
+        self.init_timer = 0
+        self.explode_x_range = int(c.GRID_X_SIZE//3 * 2)+10
+        self.explode_y_range = 0
+        self.is_init = False
+
+    def update(self):
+        if self.is_init == False:
+            self.init_timer += 1
+            if self.init_timer > 900:
+                self.is_init = True
 

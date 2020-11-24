@@ -15,7 +15,7 @@ SUNFLOWER_TIMER = 1320
 SUNFLOWER_1CHARGE = 360
 PEASHOOTER_TIMER = 120
 
-PLAY = "Iserir Planta:\n1 - Sunflower\n2 - Peashooter(n incluido)\n3 - Noz(n incluido)\n4 - Cereja(n incluido)\n5 - Batata mina(n incluido)\n0 - Descartar inserção"
+PLAY = "Iserir Planta:\n1 - Sunflower (50)\n2 - Peashooter (100)\n3 - Noz (50)\n4 - Cereja (150)\n5 - Batata mina (25)\n0 - Descartar inserção"
 
 DECISAO = "DECISAO:\n1- AVANCAR PARA PROXIMO FRAME\n2- AVANCAR MAIS DE 1 FRAME\n3- AVANCAR ATE PROXIMO SOL\n4- INICIAR JOGADA\n5- SAIR DO JOGO\nESCOLHA UMA OPCAO:"
 DECISAO_2 = "DIGITE A QUANTIDADE DE FRAMES PARA AVANCAR: "
@@ -48,6 +48,9 @@ REDWALLNUTBOWLING = 'RedWallNutBowling'
 
 PLANT_HEALTH = 5
 WALLNUT_HEALTH = 30
+
+ZOMBIE_ATTACK_TIMER = 60
+ZOMBIE_WALK_TIMER = 4
 
 plant_name_list = [SUNFLOWER, PEASHOOTER, WALLNUT,
                    CHERRYBOMB, POTATOMINE]
