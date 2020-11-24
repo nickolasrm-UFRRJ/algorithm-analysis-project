@@ -49,6 +49,7 @@ class JogoBack():
         self.sun_value = self.m.map_data[c.INIT_SUN_NAME]
         self.sun_timer = 0
         self.zombie_timer = 0
+        self.result = aux.GANHOU
         pass
 
     def addPlant(self, name, x, y):
@@ -305,6 +306,7 @@ class JogoBack():
                     print("Carro ativado!!!")
                 if zombie.x + 90 <= 0:
                     self.zombies_alive[zombie.y].pop()
+                    self.result = aux.PERDEU
                 
 
     # ADICIONANDO ZUMBIS NO DEVIDO TEMPO
@@ -339,7 +341,22 @@ class JogoBack():
                 self.m.map[plant.y][plant.x] = 0
                 self.plants_list[plant.y].remove(plant)
                             
+    # CHECANDO SE O JOGO ACABOU
+    def checkIsOver(self):
+        empty = 1
+        for i in range(c.GRID_Y_LEN):
+            if len(self.zombies_alive[i]) > 0:
+                empty = 0
+        if empty and len(self.zombie_list) > 0:
+            empty = 0
+        return empty
 
+    def checkGameResult(self):
+        print(aux.FLIP_STATE)
+        if self.result == aux.GANHOU:
+            print("Você ganhou!!! Parabéns.")
+        else:
+            print("Voce perdeu!!! Tente Novamente...")
 
     # SESSAO DOS UPDATES
 
@@ -392,6 +409,9 @@ class JogoBack():
         self.updateBullet()
         self.updateZombie()
 
+        if self.checkIsOver():
+            self.rodando = False
+
         if self.sun_timer >= aux.SUN_TIMER:
             self.sun_value += 25 * int(self.sun_timer / aux.SUN_TIMER)
             self.sun_timer = int(self.sun_timer % aux.SUN_TIMER)
@@ -443,4 +463,4 @@ class JogoBack():
         self.initJogo()
         while self.rodando:
             self.gameLoop()
-        pass
+        self.checkGameResult()

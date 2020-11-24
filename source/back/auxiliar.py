@@ -60,3 +60,6 @@ all_card_list = [0, 1, 2, 3, 4]
 
 def timeToFrame(m_seconds):
     return (int(m_seconds/1000)*60)
+
+PERDEU = "perdeu"
+GANHOU = "ganhou"
