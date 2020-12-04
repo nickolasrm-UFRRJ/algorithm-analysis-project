@@ -1,5 +1,5 @@
 import random
-from ... import constants as c
+from .... import constants as c
 from .. import auxiliar as a
 from .plant_back import *
 

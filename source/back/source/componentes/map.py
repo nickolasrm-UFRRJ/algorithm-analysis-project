@@ -1,6 +1,6 @@
 import os
 import json
-from ... import constants as c
+from .... import constants as c
 
 class Map():
     def __init__(self, x, y):
@@ -13,7 +13,7 @@ class Map():
 
     def loadMap(self):
         map_file = 'level_' + str(0) + '.json'
-        file_path = os.path.join('source', 'back', 'data', 'map', map_file)
+        file_path = os.path.join('source', 'back', 'source' , 'data', 'map', map_file)
         f = open(file_path)
         self.map_data = json.load(f)
         f.close()
@@ -26,3 +26,16 @@ class Map():
         if self.map[y][x] == 0:
             return True
         return False
+
+    def getFirstLeftFree(self, y):
+        counter = 0
+        while not self.isEmpty(counter, y) and counter < 9:
+            counter+=1
+        return counter
+    
+    def isFull(self):
+        for i in range(5):
+            for j in range(9):
+                if self.isEmpty(j, i):
+                    return 0
+        return 1

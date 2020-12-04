@@ -1,14 +1,13 @@
 import os
 import json
-from source.back.componentes.plant_back import CherryBomb
-from source.back.auxiliar import SUN_TIMER
+
 from source.constants import ATTACK, GRID_Y_LEN, POTATOMINE
-from .. import constants as c
+from ... import constants as c
 from .componentes.map import Map
 from .componentes import plant_back as plant
 from .componentes import zombie_back as zombie
 from . import auxiliar as aux
-
+import numpy.random as r
 
 class JogoBack():
     def __init__(self):
@@ -50,6 +49,8 @@ class JogoBack():
         self.sun_timer = 0
         self.zombie_timer = 0
         self.result = aux.GANHOU
+        self.over = 0
+        self.rodando = True
         pass
 
     def addPlant(self, name, x, y):
@@ -276,10 +277,13 @@ class JogoBack():
 
     def checkPlantColision(self, zombie):
         if len(self.plants_list[zombie.y]) > 0:
-            if self.m.realXPos(self.plants_list[zombie.y][0].x) >= zombie.x and zombie.state == c.WALK:
+            front_pos = self.m.realXPos(self.plants_list[zombie.y][0].x)
+            if front_pos >= zombie.x and front_pos-80 <= zombie.x and zombie.state == c.WALK:
                 zombie.setAttack()
             if self.plants_list[zombie.y][0].health <= 0:
-                self.plants_list[zombie.y].pop()
+                print(str(self.plants_list[zombie.y][0].name) + " x " + str(self.plants_list[zombie.y][0].x) + " y " + str(self.plants_list[zombie.y][0].y)) 
+                plant = self.plants_list[zombie.y][0]
+                self.plants_list[zombie.y].remove(plant)
                 zombie.setWalk()
 
 
@@ -395,7 +399,10 @@ class JogoBack():
         for i in range(c.GRID_Y_LEN):
             for zombie in self.zombies_alive[i]:
                 if zombie.state == c.ATTACK:
-                    zombie.update(self.plants_list[zombie.y][0])
+                    if len(self.plants_list[zombie.y]) > 0:
+                        zombie.update(self.plants_list[zombie.y][0])
+                    else:
+                        zombie.setWalk()
                 else:
                     zombie.update()
         pass
@@ -410,6 +417,7 @@ class JogoBack():
         self.updateZombie()
 
         if self.checkIsOver():
+            self.over = 1
             self.rodando = False
 
         if self.sun_timer >= aux.SUN_TIMER:
@@ -459,8 +467,8 @@ class JogoBack():
             print(aux.FLIP_STATE)
 
     def main(self):
-        self.rodando = True
         self.initJogo()
         while self.rodando:
             self.gameLoop()
-        self.checkGameResult()
+        if self.over:
+            self.checkGameResult()
