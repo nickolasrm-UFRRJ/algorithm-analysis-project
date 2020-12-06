@@ -1,0 +1,106 @@
+JogoBack:
+main():
+{
+    Inicia o jogo (initJogo)
+    initJogo
+    {
+        copia os zumbis (map_data[c.ZOMBIE_LIST]) pra zombies_list inicia o timer, inicia sun_value.
+        self.rodando = True
+    }
+    gameLoop()
+    {
+        while rodando == true
+        nextFrame()
+        {
+            - atualiza todos os elementos do jogo
+            - checa coisas como colisao, atk, etc.
+        }
+        - pausa quando apertar j
+        - j apertado a jogada comeca.
+        - if key == j:
+        {
+            play()
+            {
+                - ate agora vai ser um teste pra ver se o jogo roda.
+                - testar insercao de todo o tipo de planta.
+            }        
+        }
+    }
+
+} 
+
+plant_back
+{
+    class Plant {
+        - é classe abstrata com atributos: vida, nome, x, y.
+        - tem como funcoes:
+        {
+            se for sunflower tem q retornar quando tem q adicionar sol.
+            se for peashooter tem q retornar quando tem q atirar.
+            se for ... e vai ser isso.
+            update() {
+                nao precisa de alteracao
+                so retorne handleState()
+            }
+            handleState() {
+                chama a funcao de acordo com o estado, e repassa o retorno da fc de estado.
+            }
+            os 3 estados de planta, no qual tem alguma acao sao: idling, attacking e digest.
+            idling()
+            {
+                quando a planta e sunflower, retorna 1 se for hora de adicionar sol.
+            }
+        }
+
+    }
+}
+
+TIPOS DE PLANTAS NECESSARIOS:
+{
+    SUNFLOWER:
+    {
+        PRODUZ SOL EM UM INTERVALO DE TEMPO, NAO DA DANO.
+    }
+
+    PEASHOOTER:
+    {
+        ATIRA UMA BALA QUE DA UMA CERTA QUANTIDADE DE DANO, E TEM UMA CERTA VELOCIDADE.
+    }
+    NOZ
+    {
+        TEM VIDA ALTA, BLOQUEIA OS ZUMBIS POR UM BOM TEMPO.
+    }
+    BATATA_MINA
+    {
+        EXPLODE OS ZUMBIS QUE TIVEREM NO RANGE DELA, NA MESMA LINHA, TEM UM COOLDOWN DE INICIO.
+    }
+    CEREJA
+    {
+        O MESMO QUE A BATATA MINA, MAS SEM COOLDOWN, E EXPLODE INIMIGOS EM LINHAS ADJACENTES TAMBEM.
+    }
+}
+
+TIMERS
+{
+    SUN_TIMER = 7000 MILISEGUNDOS = 7 SEGUNDOS x 60 FRAMES (GAME EH EM 60 FPS) = 420 FRAMES
+    SUNFLOWER = 1 RECARGA: 6000 MILISEGUNDOS = 6 SEGUNDOS = 360 FRAMES. // RECARGA NORMAL = 22000 MILISEGUNDOS = 22 SEGUNDOS * 60 = 1320 FRAMES.
+    PEASHOOTER = 2000 MILISEGUNDOS = 2 SEGUNDOS * 60 = 120 FRAMES
+    ZOMBIE 
+    {
+        ZOMBIE_ATTACK_TIMER = 1000 MILISEGUNDOS = 1 SEGUNDO * 60 FRAMES = 60 FRAMES.
+        ZOMBIE_WALK_TIMER = 70 MILISEGUNDOS = 0,07 * 60 = 4.2 FRAMES, ADAPTANDO PARA INTEIRO = 4 FRAMES 
+    }
+}
+
+ZUMBIS {
+    COLISAO {
+        CHECA PARA TODO ZUMBI SE COLIDE COM UMA PLANTA, ORDENAR PLANTAS DE FORMA DECRESCENTE, PARA ASSIM PEGAR O PRIMEIRO ELEMENTO DA LINHA.
+        SE COLIDE, DIMINUI A VIDA DA PLANTA.
+
+        CHECA SE BALA COLIDE COM O ZUMBI MAIS PERTO ORDENAR ZUMBIS VIVOS(NECESSARIO? TALVEZ NAO POIS OS ZUMBIS SAO INSERIDOS E COMO ELES ANDAM O PRIMEIRO ZUMBI SEMPRE VAI TER O MENOR X).
+    }
+}
+SIMULATION
+{
+    HAS TO MOVE EACH TIME THE SUN_TIMER RESETS, BY THEN IT HAS TO CHOSE ONE MOVE RANDOMLY AND THEN PLACE THE PLANT IF THE CHOICE IS TO PLACE A PLANT SOMEWHERE
+}
