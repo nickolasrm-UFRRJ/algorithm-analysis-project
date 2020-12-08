@@ -94,7 +94,6 @@ class Tree(BaseTree, NodeMixin):  # Add Node feature
         return best_child
 
 def MCTS(tree): #creates the MCTS
-    
     leaf = tree.root.select_node()    
     leaf.children = leaf.expand()  
     for node in leaf.children:
@@ -108,15 +107,3 @@ def MCTS(tree): #creates the MCTS
     #best_leaf_child.back_propagation(best_leaf_child.score)
 
     return leaf.root
-
-
-
-def get_best_action(board, num_iterations): # Returns the most promissing action in the game
-
-    tree = deepcopy(board)    
-    tree.children = tree.expand()
-
-    for _ in range(num_iterations):
-        tree = MCTS(tree)
-
-    return tree.get_best_child_by_visits().currente_board

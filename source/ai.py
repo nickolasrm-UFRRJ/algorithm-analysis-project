@@ -1,5 +1,6 @@
 import copy
 import random
+import sys
 import numpy as np
 from collections import namedtuple
 from source.game import jogo_back as back
@@ -23,9 +24,13 @@ class AITree(mcts.Tree):
 
     def evaluate(self, game, oldStats):            
         stats = game.getStats()
-        grade = (-10 * (stats.plantsKilled - oldStats.plantsKilled) +\
-                10 * (stats.zombiesKilled - oldStats.zombiesKilled) +\
-                (stats.givenDamage - oldStats.givenDamage)) * (not game.isLost())
+        grade = 0
+        if game.isLost():
+            grade = -sys.float_info.max
+        else:
+            grade = -10 * (stats.plantsKilled - oldStats.plantsKilled) +\
+                    10 * (stats.zombiesKilled - oldStats.zombiesKilled) +\
+                    (stats.givenDamage - oldStats.givenDamage)
         return grade
 
     def simulate(self):
@@ -33,7 +38,7 @@ class AITree(mcts.Tree):
         stats = self.getGame().getStats()
 
         while game_copy.isRunning():
-            game_copy.runUntilNewSun()
+            game_copy.updateUntilNewSun()
             sunValue = game_copy.getSunValue()
             plantToPlace = const.SUNFLOWER
 
@@ -43,7 +48,8 @@ class AITree(mcts.Tree):
                 while plantToPlace != None:
                     plantToPlace = None
                     for i, cost in enumerate(aux.plant_sun_list):
-                        if cost < sunValue and random.uniform(0,1) < 0.5:
+                        if cost < sunValue and random.uniform(0,1) < 0.5 and \
+                                not self.getGame().isPlantFrozen(i):
                             plantToPlace = aux.plant_name_list[i]
                             break
                     if random.uniform(0,1) < 0.5: #increasing do nothing probability
@@ -63,7 +69,8 @@ class AITree(mcts.Tree):
         availablePlants = []
 
         for i, cost in enumerate(aux.plant_sun_list):
-            if cost < sunValue and random.uniform(0,1) < 0.5:
+            if cost < sunValue and random.uniform(0,1) < 0.5 and\
+                    not game.isPlantFrozen(i):
                 availablePlants.append(aux.plant_name_list[i])
         
         possibleMoves = []
@@ -82,7 +89,9 @@ def doNextMovement(game, complexity):
     for i in range(complexity):
         tree = mcts.MCTS(tree)
 
-    move = max(tree.children, key= lambda x:x.score).getMove()
+    #move = max(tree.children, key= lambda x:x.score).getMove()
+    move = tree.get_best_child_by_visits().getMove()
+
     if move is not None:
         game.addPlant(move.plant, move.x, move.y)
 

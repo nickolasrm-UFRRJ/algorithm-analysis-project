@@ -1,13 +1,14 @@
 import random
+import math
 from source.game.componentes import constants as c
 from source.game.componentes import auxiliar as a
 from source.game.componentes import plant_back
 
 class Zombie():
-    def __init__(self, name, map_y, health, damage=1):
+    def __init__(self, name, x, map_y, health, damage=1):
         self.name = name
         self.y = map_y
-        self.x = ( (c.GRID_X_LEN) * c.GRID_X_SIZE) + 50
+        self.x = x
         self.health = health
         self.damage = damage
         self.speed = 1
@@ -24,26 +25,23 @@ class Zombie():
         elif self.state == c.ATTACK:
             return self.attack(plant)
 
-    def walk(self):
-        self.walk_timer += 1
-        if self.walk_timer >= a.ZOMBIE_WALK_TIMER:
-            # print("WALKING!")
-            self.x -= self.speed
-            self.walk_timer = 0
+    def walk(self, frames = 1):
+        if frames == 1:
+            self.walk_timer += 1
+            if self.walk_timer >= a.ZOMBIE_WALK_TIMER:
+                # print("WALKING!")
+                self.x -= self.speed
+                self.walk_timer = 0
+        else:
+            self.walk_timer += frames
+            self.x -= math.floor(self.walk_timer / a.ZOMBIE_WALK_TIMER) * self.speed
+            self.walk_timer = self.walk_timer % a.ZOMBIE_WALK_TIMER
 
     def attack(self, plant):
         if plant != None:
             self.attack_timer += 1
             if self.attack_timer >= a.ZOMBIE_ATTACK_TIMER:
                 # print("ATTACKING")
-                plant.health -= self.damage
+                plant.receiveDamage(self.damage)
                 self.attack_timer = 0
                 return plant.health
-
-    def setWalk(self):
-        self.walk_timer = 0
-        self.state = c.WALK
-    
-    def setAttack(self):
-        self.attack_timer = 0
-        self.state = c.ATTACK

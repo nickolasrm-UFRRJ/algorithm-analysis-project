@@ -31,8 +31,6 @@ def getPlantEmoji(plant):
         out = ':sunflower:'
     elif isinstance(plant, Plant.PeaShooter):
         out = ':peanuts:'
-    elif isinstance(plant, Plant.CherryBomb):
-        out =  ':cherries:'
     elif isinstance(plant, Plant.PotatoMine):
         out = ':potato:'
     elif isinstance(plant, Plant.WallNut):
@@ -49,8 +47,12 @@ def printGame(game):
     for zombieRow in game.getZombiesAliveList():
         for zombie in zombieRow:
             xPos = math.floor(zombie.x / 80)
-            if xPos < 9:
-                map[zombie.y][xPos] = getZombieEmoji()
+            if xPos < 9 and xPos > -1:
+                if game.isThereAPlant(game.getMap().getZombieXPosInMap(zombie), zombie.y):
+                    if xPos+1 < 9:
+                        map[zombie.y][xPos+1] = getZombieEmoji()
+                else:
+                    map[zombie.y][xPos] = getZombieEmoji()
     print('-----------------------------------------')
     print(getSunEmoji(), "Sun: ", game.getSunValue())
     print('-----------------------------------------')

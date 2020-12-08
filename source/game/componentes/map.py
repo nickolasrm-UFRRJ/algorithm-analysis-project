@@ -10,7 +10,7 @@ class Map():
         self.alt = y
         self.larg_cell = c.GRID_X_SIZE
         self.alt_cell = c.GRID_Y_SIZE
-        self.map = [[0 for x in range(self.larg)] for y in range(self.alt)]
+        self.map = [[None for x in range(self.larg)] for y in range(self.alt)]
         self.loadMap(lvl)
 
     def loadMap(self, lvl):

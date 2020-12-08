@@ -30,24 +30,8 @@ IS_ACTIVE = 1
 
 SUNFLOWER = 'SunFlower'
 PEASHOOTER = 'Peashooter'
-SNOWPEASHOOTER = 'SnowPea'
 WALLNUT = 'WallNut'
-CHERRYBOMB = 'CherryBomb'
-THREEPEASHOOTER = 'Threepeater'
-REPEATERPEA = 'RepeaterPea'
-CHOMPER = 'Chomper'
-CHERRY_BOOM_IMAGE = 'Boom'
-PUFFSHROOM = 'PuffShroom'
 POTATOMINE = 'PotatoMine'
-SQUASH = 'Squash'
-SPIKEWEED = 'Spikeweed'
-JALAPENO = 'Jalapeno'
-SCAREDYSHROOM = 'ScaredyShroom'
-SUNSHROOM = 'SunShroom'
-ICESHROOM = 'IceShroom'
-HYPNOSHROOM = 'HypnoShroom'
-WALLNUTBOWLING = 'WallNutBowling'
-REDWALLNUTBOWLING = 'RedWallNutBowling'
 
 PLANT_HEALTH = 5
 WALLNUT_HEALTH = 30
@@ -55,11 +39,10 @@ WALLNUT_HEALTH = 30
 ZOMBIE_ATTACK_TIMER = 60
 ZOMBIE_WALK_TIMER = 4
 
-plant_name_list = [SUNFLOWER, PEASHOOTER, WALLNUT,
-                   CHERRYBOMB, POTATOMINE]
-plant_sun_list = [50, 100, 50, 150, 25]
-plant_frozen_time_list = [450, 450, 1800, 3000, 1800]
-all_card_list = [0, 1, 2, 3, 4]
+plant_name_list = [SUNFLOWER, PEASHOOTER, WALLNUT, POTATOMINE]
+plant_sun_list = [50, 100, 50, 25]
+plant_frozen_time_list = [450, 450, 1800, 1800]
+all_card_list = [0, 1, 2, 3]
 
 def timeToFrame(m_seconds):
     return (int(m_seconds/1000)*60)
