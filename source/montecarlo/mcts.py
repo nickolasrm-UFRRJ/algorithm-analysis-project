@@ -1,6 +1,7 @@
 # Impplementation using anytree library
 # To install the anytree module run:
 #    pip install anytree
+import source.ui
 
 import time
 from anytree import Node, NodeMixin, RenderTree
@@ -42,11 +43,10 @@ class Tree(BaseTree, NodeMixin):  # Add Node feature
         var = self
         best_node = self
 
-        while var.is_leaf == False:
-
+        while len(var.children) > 0:
             for node in var.children:
                 if node.ucb1() > max:
-                    max = node.ucb1()
+                    max = node.ucb1()#node.ucb1()
                     best_node = node
             var = best_node
             max = -math.inf
@@ -74,7 +74,7 @@ class Tree(BaseTree, NodeMixin):  # Add Node feature
     def get_best_child_by_visits(self): #selects the most visited child
 
         max = 0
-        var = None
+        var = self
         for node in self.root.children:
             if node.visits > max:
                 max = node.visits
@@ -84,7 +84,7 @@ class Tree(BaseTree, NodeMixin):  # Add Node feature
     def get_best_child_by_ucb(self): #selectes the child that has the highest UBB value
 
         max = -math.inf
-        best_child = None
+        best_child = self
 
         for node in self.root.children:
             if node.ucb1() > max:
@@ -94,19 +94,15 @@ class Tree(BaseTree, NodeMixin):  # Add Node feature
         return best_child
 
 def MCTS(tree): #creates the MCTS
-    
-    leaf = tree.root.select_node()    
+    leaf = tree.root.select_node()#tree.root.select_node()    
     leaf.children = leaf.expand()  
+    scoreSum = 0
     for node in leaf.children:
-        node.score = node.simulate()
+        node.simulate()
         node.visits = 1
-        node.back_propagation(node.score)
+        scoreSum += node.score
+    node.back_propagation(scoreSum)
     
-    #best_leaf_child = leaf.get_best_child_by_ucb()
-    #best_leaf_child.score = best_leaf_child.simulate()
-    #best_leaf_child.visits = 1
-    #best_leaf_child.back_propagation(best_leaf_child.score)
-
     return leaf.root
 
 

@@ -9,7 +9,7 @@ from source.game.componentes import auxiliar as aux
 from collections import namedtuple
 import numpy.random as r
 
-Stats = namedtuple('Stats', 'plantsKilled zombiesKilled givenDamage')
+Stats = namedtuple('Stats', 'plantsKilled zombiesKilled givenDamage lostCars')
 
 class JogoBack():
     def __init__(self, lvl=1):
@@ -83,11 +83,13 @@ class JogoBack():
         return self.givenDamage
     def isLost(self):
         return self.lost
+    def isFrozen(self, id):
+        return self.freezing[id] > 0
     #setters
-    def increasePlantsKilledCounter(self):
-        self.plantsKilled += 1
-    def increaseZombiesKilledCounter(self):
-        self.zombiesKilled += 1
+    def increasePlantsKilledCounter(self, n=1):
+        self.plantsKilled += n
+    def increaseZombiesKilledCounter(self, n=1):
+        self.zombiesKilled += n
     def increaseGivenDamage(self, dmg):
         self.givenDamage += dmg
     def setPlantInMap(self, x, y):
@@ -100,21 +102,28 @@ class JogoBack():
         self.sun_value -= val
 
     def getStats(self):
+        
         return Stats(self.plantsKilled,
                     self.zombiesKilled,
-                    self.givenDamage)
+                    self.givenDamage,
+                    self.getMap().getHeight()-sum(self.cars))
 
     def getAddingPlantDataByName(self, name, x, y):
         if name == c.SUNFLOWER:
-            return (plant.SunFlower(x, y), aux.plant_sun_list[0])
+            return (plant.SunFlower(x, y), 0,\
+                aux.plant_frozen_time_list[0], aux.plant_sun_list[0])
         elif name == c.PEASHOOTER:
-            return (plant.PeaShooter(x, y), aux.plant_sun_list[1])
+            return (plant.PeaShooter(x, y), 1,\
+                aux.plant_frozen_time_list[1], aux.plant_sun_list[1])
         elif name == c.WALLNUT:
-            return (plant.WallNut(x, y), aux.plant_sun_list[2])
+            return (plant.WallNut(x, y), 2,\
+                aux.plant_frozen_time_list[2], aux.plant_sun_list[2])
         elif name == c.CHERRYBOMB:
-            return (plant.CherryBomb(x, y), aux.plant_sun_list[3])
+            return (plant.CherryBomb(x, y), 3,\
+                aux.plant_frozen_time_list[3], aux.plant_sun_list[3])
         elif name == c.POTATOMINE:
-            return (plant.PotatoMine(x, y), aux.plant_sun_list[4])
+            return (plant.PotatoMine(x, y), 4,\
+                aux.plant_frozen_time_list[4], aux.plant_sun_list[4])
         return None
 
     def addPlant(self, name, x, y):
@@ -123,7 +132,8 @@ class JogoBack():
             if plant is not None:
                 self.plants_list[y].append(plant[0])
                 self.setPlantInMap(x,y)
-                self.decreaseSunValue(plant[1])
+                self.decreaseSunValue(plant[3])
+                self.freezing[plant[1]] = plant[2]
                 return True
         return False
         
@@ -147,6 +157,7 @@ class JogoBack():
                 #print(str(self.plants_list[zombie.y][0].name) + " x " + str(self.plants_list[zombie.y][0].x) + " y " + str(self.plants_list[zombie.y][0].y)) 
                 plant = self.plants_list[zombie.y][0]
                 self.plants_list[zombie.y].remove(plant)
+                self.increasePlantsKilledCounter()
                 zombie.setWalk()
 
 
@@ -201,6 +212,7 @@ class JogoBack():
                         real_x = self.m.realXPos(plant.x)
                         if abs( ( zombie.x + 14) - ( real_x - 40 ) ) <= plant.explode_x_range:
                             self.zombies_alive[i].remove(zombie)
+                            self.increaseZombiesKilledCounter()
                             did_boom = True
             if did_boom:
                 self.m.map[plant.y][plant.x] = 0
